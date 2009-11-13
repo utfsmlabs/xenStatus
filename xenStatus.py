@@ -8,6 +8,7 @@ except ImportError:
 
 from xen.xend.XendClient import server
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+import signal, os, sys
 
 
 class XenHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -24,7 +25,16 @@ class XenHTTPRequestHandler(BaseHTTPRequestHandler):
                          ]))
         self.wfile.close
 
+def sigHandler(signum, frame):
+    os.remove(pidFile)
+    print 'SIGTERM received, shutting down server'
+    sys.exit(0)
+
 def main():
+    f = open(pidFile, 'w')
+    f.write(str(os.getpid()))
+    f.close()
+    signal.signal(signal.SIGTERM, sigHandler)
     try:
         server = HTTPServer(('', 8080), XenHTTPRequestHandler)
         print 'started httpserver...'
@@ -32,7 +42,10 @@ def main():
     except KeyboardInterrupt:
         print '^C received, shutting down server'
         server.socket.close()
+    os.remove(pidFile)
+    return 0
 
+pidFile = '/var/run/xen-list.pid'
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
 
