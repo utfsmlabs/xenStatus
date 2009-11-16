@@ -12,18 +12,38 @@ import signal, os, sys
 
 
 class XenHTTPRequestHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
+    def prettyprint_json(s):
+        return '\n'.join([l.rstrip()
+                         for l in  json.dumps(
+                             s, indent=4, sort_keys=True).splitlines()
+                         ])
+    prettyprint_json = staticmethod(prettyprint_json)
+
+    def get_json_list(self):
         vms = server.xend.domains()
         self.send_response(200)
-        self.send_header("Content-Type", "text/plain") #Hacer text/x-jason después
+        self.send_header("Content-Type", "text/x-json")
         self.end_headers()
-        self.wfile.write('\n'.join(
-                         [l.rstrip()
-                         for l in  json.dumps(server.xend.domains(),
-                                              indent=4,
-                                              sort_keys=True).splitlines()
-                         ]))
-        self.wfile.close
+        server_list = map(
+            lambda x: filter( lambda x: x[0] == 'name', x)[0][1],
+            server.xend.domains())
+        self.wfile.write(self.prettyprint_json(server_list))
+        self.wfile.close()
+
+    def get_404(self):
+        self.send_response(404)
+        self.send_header("Content-Type", "text/plain")
+        self.end_headers()
+        self.wfile.write("OMG! You broke XenStatus!")
+        self.wfile.close()
+        
+    def dispatch(self):
+        if(self.path=='/list.json'):
+            return self.get_json_list
+        else:
+            return self.get_404
+    def do_GET(self):
+        self.dispatch()()
 
 def sigHandler(signum, frame):
     os.remove(pidFile)
