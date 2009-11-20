@@ -1,0 +1,57 @@
+#!/bin/sh
+# Script to manage xenStatus in Red Hat based distros.
+
+. /etc/init.d/functions
+prog="xenStatus"
+
+start() {
+	echo -n $"Starting $prog: "	
+        if [ -e /var/run/xen-list.pid ]; then
+		echo -n $"cannot start xenStatus: xenStatus already running.";
+		failure $"cannot start xenStatus: xenStatus already running.";
+		echo
+		return 1
+	fi
+	daemon 'xenStatus & &> /dev/null'
+	RETVAL=$?
+	echo
+	return $RETVAL
+}
+
+stop() {
+	echo -n $"Stopping $prog: "
+        if [ ! -e /var/run/xen-list.pid ]; then
+	    echo -n $"cannot stop xenStatus: xenStatus is not running."
+	    failure $"cannot stop xenStatus: xenStatus is not running."
+	    echo
+	    return 1;
+	fi
+	#killproc xenStatus
+        kill `cat /var/run/xen-list.pid`
+	RETVAL=$?
+	echo
+        #if [ -e /var/run/xen-list.pid ]; then
+        #    rm /var/run/xen-list.pid
+        #fi
+	return $RETVAL
+}	
+
+restart() {
+  	stop
+	start
+}	
+
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
+	;;
+  restart)
+  	restart
+	;;
+  *)
+	echo $"Usage: $0 {start|stop|status|restart}"
+	exit 1
+esac
