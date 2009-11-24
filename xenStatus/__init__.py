@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 
 # Copyright 2009 Javier Aravena Claramunt.
@@ -18,8 +17,5 @@
 # You should have received a copy of the GNU General Public License
 # along with XenStatus.  If not, see <http://www.gnu.org/licenses/>.
 
-from xenStatus.daemon import main
-import sys
+__all__ = ["HTTPRequestHandler", "daemon"]
 
-if __name__ == '__main__'
-sys.exit(main())
