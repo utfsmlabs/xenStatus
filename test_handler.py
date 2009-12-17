@@ -18,9 +18,14 @@
 # You should have received a copy of the GNU General Public License
 # along with XenStatus.  If not, see <http://www.gnu.org/licenses/>.
 
-from xenStatus.statusDaemon import main
-import sys
+from  xenStatus.HTTPRequestHandler import XenHTTPRequestHandler
+from BaseHTTPServer import HTTPServer
 
 if __name__ == '__main__':
-    sys.exit(main())
-
+    try:
+        server = HTTPServer(('', 8080), XenHTTPRequestHandler)
+        print 'started httpserver...'
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print '^C received, shutting down server'
+        server.socket.close()

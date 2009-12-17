@@ -32,7 +32,7 @@ class XenHTTPRequestHandler(BaseHTTPRequestHandler):
             for l in  json.dumps(
                 s, indent=4, sort_keys=True).splitlines()
             ])
-        prettyprint_json = staticmethod(prettyprint_json)
+    prettyprint_json = staticmethod(prettyprint_json)
 
     def get_json_list(self):
         vms = server.xend.domains()

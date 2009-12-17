@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 
 # Copyright 2009 Javier Aravena Claramunt.
@@ -18,9 +17,19 @@
 # You should have received a copy of the GNU General Public License
 # along with XenStatus.  If not, see <http://www.gnu.org/licenses/>.
 
-from xenStatus.statusDaemon import main
+from  xenStatus.HTTPRequestHandler import XenHTTPRequestHandler
+from BaseHTTPServer import HTTPServer
+from xenStatus.daemon import Daemon
 import sys
 
-if __name__ == '__main__':
-    sys.exit(main())
+class statusDaemon(Daemon):
+    def run(self):
+	server = HTTPServer(('', 8080), XenHTTPRequestHandler)
+	print 'started httpserver...'
+	server.serve_forever()
+	server.socket.close()
+
+def main():
+    daemon = statusDaemon('/var/run/xenstatus.pid')
+    daemon.start()
 
