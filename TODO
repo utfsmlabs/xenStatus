@@ -1,4 +1,4 @@
 * Detailed view for an individual domain
 * HTML Views (far future)
-* Double Fork Magic
-* setup.py
+* logging
+* handle SIGTERM
