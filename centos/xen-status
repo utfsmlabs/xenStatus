@@ -6,13 +6,13 @@ prog="xenStatus"
 
 start() {
 	echo -n $"Starting $prog: "	
-        if [ -e /var/run/xen-list.pid ]; then
+        if [ -e /var/run/xenstatus.pid ]; then
 		echo -n $"cannot start xenStatus: xenStatus already running.";
 		failure $"cannot start xenStatus: xenStatus already running.";
 		echo
 		return 1
 	fi
-	daemon 'xenStatus & &> /dev/null'
+	daemon 'xen-status'
 	RETVAL=$?
 	echo
 	return $RETVAL
@@ -20,20 +20,20 @@ start() {
 
 stop() {
 	echo -n $"Stopping $prog: "
-        if [ ! -e /var/run/xen-list.pid ]; then
+        if [ ! -e /var/run/xenstatus.pid ]; then
 	    echo -n $"cannot stop xenStatus: xenStatus is not running."
 	    failure $"cannot stop xenStatus: xenStatus is not running."
 	    echo
 	    return 1;
 	fi
 	#killproc xenStatus
-        kill `cat /var/run/xen-list.pid`
-	RETVAL=$?
-	echo
-        #if [ -e /var/run/xen-list.pid ]; then
-        #    rm /var/run/xen-list.pid
-        #fi
-	return $RETVAL
+        kill `cat /var/run/xenstatus.pid`
+        RETVAL=$?
+        if [ -e /var/run/xenstatus.pid ]; then
+            rm /var/run/xenstatus.pid
+        fi
+        success "Stoping xenStatus"
+        return $RETVAL
 }	
 
 restart() {

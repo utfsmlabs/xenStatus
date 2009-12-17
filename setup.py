@@ -10,6 +10,7 @@ setup(
     author_email = 'javier@aravenas.com',
     license =      'GPLv3',
     packages =     ['xenStatus'],
-    scripts =      ['xenStatus.py'],
+    scripts =      ['xen-status'],
+    data_files =   [('/etc/init.d', ['centos/xen-status'])],
 )
 
