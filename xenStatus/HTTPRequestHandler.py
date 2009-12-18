@@ -24,7 +24,7 @@ except ImportError:
 
 from xen.xend.XendClient import server
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-import signal, os, sys
+from xenStatus import details
 
 class XenHTTPRequestHandler(BaseHTTPRequestHandler):
     """
@@ -47,13 +47,26 @@ class XenHTTPRequestHandler(BaseHTTPRequestHandler):
         Handles a request for the list of hosts
         """
         vms = server.xend.domains()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/x-json")
-        self.end_headers()
         server_list = map(
                 lambda x: filter( lambda x: x[0] == 'name', x)[0][1],
                 server.xend.domains())
-        self.wfile.write(self.prettyprint_json(server_list))
+        self.get_json(server_list)
+
+    def get_json_details(self):
+        """
+        Handles a request for the details of all the hosts
+        """
+        self.get_json(details.xen_list_to_dict_list(
+            server.xend.domains()))
+
+    def get_json(self, data):
+        """
+        Serves the object hierarchy provided in data as json
+        """
+        self.send_response(200,"Ooooki")
+        self.send_header("Content-Type", "text/x-json")
+        self.end_headers()
+        self.wfile.write(self.prettyprint_json(data))
         self.wfile.close()
 
     def get_404(self):
@@ -73,6 +86,8 @@ class XenHTTPRequestHandler(BaseHTTPRequestHandler):
         """
         if(self.path=='/list.json'):
             self.get_json_list()
+        elif(self.path=='/details.json'):
+            self.get_json_details()
         else:
             self.get_404()
 

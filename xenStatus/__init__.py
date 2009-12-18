@@ -17,5 +17,5 @@
 # You should have received a copy of the GNU General Public License
 # along with XenStatus.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ["HTTPRequestHandler", "daemon"]
+__all__ = ["HTTPRequestHandler", "daemon", "statusDaemon", "details.py"]
 
